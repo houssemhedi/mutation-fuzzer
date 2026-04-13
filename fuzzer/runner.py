@@ -1,4 +1,3 @@
-# fuzzer/runner.py
 import os
 import sys
 import signal
@@ -10,18 +9,15 @@ import time
 from pathlib import Path
 from mutators import ALL_MUTATORS
 
-# ── Config ────────────────────────────────────────────────────────────────────
-TIMEOUT      = 2          # seconds before we consider it a hang
-MAX_INPUT    = 65536      # cap mutated input size (64 KB)
+TIMEOUT      = 2          
+MAX_INPUT    = 65536     
 CRASH_SIGS   = {
-    -signal.SIGSEGV: "SIGSEGV",   # segfault
-    -signal.SIGABRT: "SIGABRT",   # abort (heap corruption, assert)
-    -signal.SIGFPE:  "SIGFPE",    # divide by zero / FP exception
-    -signal.SIGBUS:  "SIGBUS",    # bus error (misaligned access)
-    -signal.SIGILL:  "SIGILL",    # illegal instruction
-}
+    -signal.SIGSEGV: "SIGSEGV",   
+    -signal.SIGABRT: "SIGABRT",   
+    -signal.SIGFPE:  "SIGFPE",
+    -signal.SIGBUS:  "SIGBUS",    
+    -signal.SIGILL:  "SIGILL",    
 
-# ── Crash deduplication set (lives in memory this stage) ─────────────────────
 seen_crashes = set()
 
 
@@ -37,10 +33,7 @@ def load_corpus(corpus_dir: str) -> list[bytes]:
 
 
 def save_crash(crash_dir: str, data: bytes, sig_name: str, target_name: str) -> str | None:
-    """
-    Hash the crash input. If we've never seen this hash before,
-    save it and return the filepath. Otherwise return None (duplicate).
-    """
+
     h = hashlib.sha256(data).hexdigest()[:16]
     if h in seen_crashes:
         return None
@@ -81,10 +74,6 @@ def run_once(binary: str, data: bytes) -> tuple[int, str]:
 
 
 def fuzz(binary: str, corpus_dir: str, crash_dir: str, iterations: int = 0):
-    """
-    Main fuzzing loop.
-    iterations=0 means run forever.
-    """
     corpus     = load_corpus(corpus_dir)
     target     = Path(binary).name
     count      = 0
@@ -103,12 +92,10 @@ def fuzz(binary: str, corpus_dir: str, crash_dir: str, iterations: int = 0):
             if iterations and count >= iterations:
                 break
 
-            # Pick a random seed and a random mutator
             seed    = random.choice(corpus)
             mutator = random.choice(ALL_MUTATORS)
             mutated = mutator.mutate(seed)
 
-            # Cap size to avoid absurdly slow runs
             if len(mutated) > MAX_INPUT:
                 mutated = mutated[:MAX_INPUT]
 
@@ -118,7 +105,7 @@ def fuzz(binary: str, corpus_dir: str, crash_dir: str, iterations: int = 0):
             if sig == "TIMEOUT":
                 hangs += 1
 
-            elif sig:  # it's a real crash signal
+            elif sig:  
                 saved = save_crash(crash_dir, mutated, sig, target)
                 if saved:
                     crashes += 1
@@ -127,7 +114,6 @@ def fuzz(binary: str, corpus_dir: str, crash_dir: str, iterations: int = 0):
                     print(f"{count:>8}  {execs_s:>7.1f}  {crashes:>8}  {hangs:>6}  {len(corpus):>7}  "
                           f"\033[91m{sig}\033[0m  → {Path(saved).name}")
 
-            # Print stats every 500 iterations
             if count % 500 == 0:
                 elapsed = time.time() - start_time
                 execs_s = count / elapsed if elapsed > 0 else 0

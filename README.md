@@ -11,22 +11,22 @@ Built as a deep-dive into memory corruption and fuzzing internals.
 ## Architecture
 mutation-fuzzer/
 ├── targets/
-│   ├── target_bof.c          # Stack buffer overflow (CVE class: CWE-121)
-│   ├── target_heap.c         # Heap overflow (CVE class: CWE-122)
-│   ├── target_fmt.c          # Format string bug (CVE class: CWE-134)
-│   └── build.sh              # Builds all targets: plain, hardened, ASAN, gcov
-├── corpus/                   # Seed inputs
-├── crashes/                  # Raw crash inputs saved by fuzzer
-├── triaged/                  # Deduplicated + minimized unique crashes
+│   ├── target_bof.c        
+│   ├── target_heap.c    
+│   ├── target_fmt.c       
+│   └── build.sh             
+├── corpus/                   
+├── crashes/                  
+├── triaged/                  
 └── fuzzer/
-├── mutators.py            # 8 mutation strategies (bit flip → havoc)
-├── runner.py              # Subprocess runner + signal-based crash detector
-├── triage.py              # ASAN-powered crash triage + input minimizer
-├── coverage.py            # gcov-based branch coverage tracker
-├── greybox.py             # AFL-style coverage-guided fuzzing loop
-├── fuzz.py                # CLI: blackbox fuzzer
-├── greybox_cli.py         # CLI: greybox fuzzer
-└── triage_cli.py          # CLI: crash triage
+├── mutators.py           
+├── runner.py            
+├── triage.py             
+├── coverage.py
+├── greybox.py             
+├── fuzz.py                
+├── greybox_cli.py         
+└── triage_cli.py       
 
 ---
 

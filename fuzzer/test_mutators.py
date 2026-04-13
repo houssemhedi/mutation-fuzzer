@@ -1,4 +1,3 @@
-# test_mutators.py — run this to verify your mutation engine works
 import sys
 sys.path.insert(0, "fuzzer")
 from mutators import ALL_MUTATORS

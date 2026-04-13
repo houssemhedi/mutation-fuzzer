@@ -1,4 +1,3 @@
-# fuzzer/fuzz.py
 import argparse
 import sys
 import os
@@ -23,7 +22,6 @@ def main():
         print(f"[!] Binary not found: {args.binary}")
         sys.exit(1)
 
-    # Optionally force a single mutator
     if args.mutator:
         from mutators import get_mutator, ALL_MUTATORS
         forced = get_mutator(args.mutator)
